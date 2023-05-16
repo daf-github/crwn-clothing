@@ -1,14 +1,12 @@
-
 import { useState } from 'react';
-import { getFirebaseApp } from '../../utils/firebase/firebase.helper'; 
+import { getFirebaseApp } from '../../utils/firebase/firebase.helper';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { createUserDocumentFromAuth } from '../../utils/firebase/firebase.utils'; 
-
-
+import { createUserDocumentFromAuth } from '../../utils/firebase/firebase.utils';
+import FormInput from '../form-input/form-input.component';
+import './sign-up-form.styles.scss';
+import Button from '../button/button-component';
 
 const SignUpForm = () => {
-	 
-
 	const defaultFormFields = {
 		displayName: '',
 		email: '',
@@ -16,21 +14,18 @@ const SignUpForm = () => {
 		confirmPassword: '',
 	};
 
-	
-
 	const [formFields, setFormFields] = useState(defaultFormFields);
 	const { displayName, email, password, confirmPassword } = formFields;
 
 	const resetFormFields = () => {
-		setFormFields(defaultFormFields);	
-	}
+		setFormFields(defaultFormFields);
+	};
 
 	const changeHandler = (event) => {
 		const { name, value } = event.target;
-		
 
 		setFormFields((prevState) => {
-			return {...prevState, [name]: value};
+			return { ...prevState, [name]: value };
 		});
 	};
 
@@ -41,90 +36,78 @@ const SignUpForm = () => {
 		const auth = getAuth(firebaseApp);
 
 		if (password !== confirmPassword) {
-			alert("passwords do not match");
+			alert('passwords do not match');
 			return;
-		
-		
 		}
 
-		 
-		 
-
 		try {
+			const { user } = await createUserWithEmailAndPassword(
+				auth,
+				email,
+				password
+			);
 
-			const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
-			await createUserDocumentFromAuth(user, { displayName});
+			await createUserDocumentFromAuth(user, { displayName });
 
 			resetFormFields();
-
-
-			
 		} catch (error) {
 			if (error.code === 'auth/email-already-in-use') {
 				alert('Cannot create user, email already in use');
+			} else if (error.code === 'auth/weak-password') {
+				alert('Password should be at least 6 character');
 			} else {
-				console.log('user creation encountered an error', error);	
+				console.log('user creation encountered an error', error);
 			}
-			
-			
-			
 		}
-
-		 
-
-
-
-
-
-
 	};
 
 	return (
-		<div>
-			<h1>Sign up with email and password</h1>
+		<div className='sign-up-container'>
+			<h2>Don't have an account?</h2>
+			<span>Sign up with email and password</span>
 
 			<form onSubmit={submitHandler}>
-				<label>Display Name</label>
-				<input
+				<FormInput
+					label='Display Name'
 					type='text'
 					required={true}
 					onChange={changeHandler}
 					value={displayName}
 					name='displayName'
-				></input>
+				/>
 
-				<label>Email</label>
-				<input
+				<FormInput
+					label='Email'
 					type='email'
 					required={true}
 					onChange={changeHandler}
 					value={email}
 					name='email'
-				></input>
+				/>
 
-				<label>Password</label>
-				<input
+				<FormInput
+					label='Password'
 					type='password'
 					required={true}
 					onChange={changeHandler}
 					value={password}
 					name='password'
-				></input>
+				/>
 
-				<label>Confirm Password</label>
-				<input
+				<FormInput
+					label='Confirm Password'
 					type='password'
 					required={true}
 					onChange={changeHandler}
 					value={confirmPassword}
 					name='confirmPassword'
-				></input>
+				/>
+ 
 
-				<button type='submit'>Sing in</button>
-
-			 
-
+				<Button 
+					type='submit'
+					buttonType='inverted'
+				>Sing up</Button>
 			</form>
 		</div>
 	);
