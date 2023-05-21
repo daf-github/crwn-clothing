@@ -1,6 +1,6 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { createUserDocumentFromAuth, signInWithAuthUserEmailAndPassword, signInWithGooglePopUp } from '../../utils/firebase/firebase.utils';
-import { UserContext } from '../../contexts/user.context';
+
 
 import FormInput from '../form-input/form-input.component';
 import './sign-in-form.styles.scss';
@@ -13,7 +13,7 @@ const defaultFormFields = {
 
 const SignInForm = () => {
 
-	const { setCurrentUser } = useContext(UserContext);	
+	// const { setCurrentUser } = useContext(UserContext);	<-- no need any mor (Observer Pattern)
 
 	const [formFields, setFormFields] = useState(defaultFormFields);
 	const { email, password } = formFields;
@@ -31,9 +31,9 @@ const SignInForm = () => {
 	};
 
 	const signInWithGoogle = async () => {
-		const { user } = await signInWithGooglePopUp();
-		setCurrentUser(user);
-		await createUserDocumentFromAuth(user);
+		await signInWithGooglePopUp();
+		// setCurrentUser(user); <<-- it is centralized inside the context (Observer Pattern)
+		// await createUserDocumentFromAuth(user); <<-- it is centralized inside the context (Observer Pattern)
 
 	};
 
@@ -45,8 +45,10 @@ const SignInForm = () => {
 		try {
 			 
 
-			const { user} = await signInWithAuthUserEmailAndPassword(email, password);
-			setCurrentUser(user);		
+			await signInWithAuthUserEmailAndPassword(email, password);
+
+			// setCurrentUser(user); <<-- it is centralized inside the context (Observer Pattern)		
+
 			resetFormFields();
 		} catch (error) {
 
