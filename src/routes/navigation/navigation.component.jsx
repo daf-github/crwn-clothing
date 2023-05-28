@@ -18,7 +18,7 @@ import { LogoContainer, NavLinks, NavLink, NavigationContainer } from './navigat
 const Navigation = () => {
 	const { currentUser } = useContext(UserContext);
 
-	console.log( currentUser );
+ 
 
 	const { isCartOpen } = useContext(CartContext);
 
